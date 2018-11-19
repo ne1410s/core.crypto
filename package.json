@@ -1,0 +1,38 @@
+{
+  "name": "@ne1410s/crypto",
+  "version": "0.0.1",
+  "description": "ES Crypto Utilities",
+  "main": "./dist/ne14.crypto.js",
+  "module": "./dist/ne14.crypto.es.js",
+  "files": [
+    "dist"
+  ],
+  "types": "./dist/ne14.crypto.d.ts",
+  "scripts": {
+    "test": "rollup -cm && mocha --exit",
+    "bundle": "rollup -c"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ne1410s/ne14.crypto.git"
+  },
+  "keywords": [
+    "ES",
+    "Crypto",
+    "Utilities"
+  ],
+  "author": "ne1410s <pgj646@gmail.com> (http://ne1410s.co.uk)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ne1410s/ne14.crypto/issues"
+  },
+  "homepage": "https://github.com/ne1410s/ne14.crypto#readme",
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "eslint": "^5.9.0",
+    "mocha": "^5.2.0",
+    "rollup": "^0.67.1",
+    "rollup-plugin-typescript2": "^0.18.0",
+    "typescript": "^3.1.6"
+  }
+}
