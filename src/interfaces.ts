@@ -1,5 +1,5 @@
 
-export class JWKPair {
-    private: string;
-    public: string;
+export interface IKeyPair_JWK {
+    private: JsonWebKey;
+    public: JsonWebKey;
 }

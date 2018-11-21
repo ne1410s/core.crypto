@@ -5,12 +5,8 @@ const ne14 = {
 
 describe('#signing', () => {
 
-    it('should reference the text module :)', () => {
-
-        let result = ne14.crypto.check();
-        console.log(result);
-
-        expect(result).to.equal('aGVsbG8gd29ybGQ=');
+    it('should generate a key pair', async () => {
+        let keys = await ne14.crypto.gen();
+        console.log(keys);
     });
-
 });

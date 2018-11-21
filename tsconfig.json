@@ -2,7 +2,7 @@
     "compilerOptions": {
       "declaration": true,
       "declarationDir": "dist",
-      "lib": ["es2015", "es6"],
+      "lib": ["dom", "es2015"],
       "module": "es6",
       "moduleResolution": "node",
       "noImplicitAny": true,
