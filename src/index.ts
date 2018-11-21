@@ -8,7 +8,7 @@ const DEF_ALGO: RsaHashedKeyGenParams = {
     hash: { name: 'SHA-256' },
 };
 
-export abstract class Crypto {
+export default abstract class Crypto {
     
     public static async gen(): Promise<IKeyPair_JWK> {
 
