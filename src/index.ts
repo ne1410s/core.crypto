@@ -1,13 +1,11 @@
-import { Pi } from './constants';
+import Text from "@ne1410s/text";
+import { JWKPair } from './interfaces';
 
-export default class MyTest {
+export abstract class Crypto {
     
-    public area: number;
-    public circumference: number;
-
-    constructor(public radius: number) {
-        this.area = Pi * this.radius * this.radius;
-        this.circumference = Pi * this.radius * 2;
+    public static async gen(): Promise<JWKPair> {
+        const keys = await crypto.subtle.generateKey('', true, ['sign']);
+        return new JWKPair();
     }
 
 }
