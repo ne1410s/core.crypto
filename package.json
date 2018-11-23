@@ -30,6 +30,7 @@
   },
   "homepage": "https://github.com/ne1410s/ne14.crypto#readme",
   "devDependencies": {
+    "@types/pkijs": "0.0.1",
     "chai": "^4.2.0",
     "eslint": "^5.9.0",
     "mocha": "^5.2.0",
@@ -40,6 +41,7 @@
   },
   "dependencies": {
     "@ne1410s/text": "0.0.3",
+    "asn1js": "^2.0.21",
     "node-webcrypto-ossl": "^1.0.38",
     "pkijs": "^2.1.72"
   }
