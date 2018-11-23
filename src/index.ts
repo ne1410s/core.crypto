@@ -1,6 +1,7 @@
 import Text from "@ne1410s/text";
-import { IKeyPair_JWK } from './interfaces';
+import * as WebCrypto from "node-webcrypto-ossl";
 
+const crypto = new WebCrypto();
 const DEF_ALGO: RsaHashedKeyGenParams = {
     name: 'RSASSA-PKCS1-v1_5',
     modulusLength: 2048,
@@ -10,12 +11,12 @@ const DEF_ALGO: RsaHashedKeyGenParams = {
 
 export default abstract class Crypto {
     
-    public static async gen(): Promise<IKeyPair_JWK> {
+    public static async gen(text: string): Promise<any> {
 
         const keys = await crypto.subtle.generateKey(DEF_ALGO, true, ['sign']);
         return {
-            private: await crypto.subtle.exportKey('jwk', keys.privateKey),
-            public: await crypto.subtle.exportKey('jwk', keys.publicKey)
+            publicJwk: await crypto.subtle.exportKey('jwk', keys.publicKey),
+            privateJwk: await crypto.subtle.exportKey('jwk', keys.privateKey)
         };
     }
 }
