@@ -1,6 +1,6 @@
 const expect = require('chai').expect;
 const ne14 = {
-    crypto: require('../dist/index')
+    crypto: require('../dist/index').default
 };
 
 const TEST_KEY = { 

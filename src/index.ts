@@ -1,15 +1,14 @@
-import * as WebCrypto from "node-webcrypto-ossl";
+//import * as WebCrypto from "node-webcrypto-ossl";
+
+var asn1js = require('asn1js');
+var pkijs = require('pkijs');
+var WebCrypto = require("node-webcrypto-ossl");
+
 import Text from "@ne1410s/text";
 import { IKeyPair_Jwk, ICsr_Params, ICsr_Result } from "./interfaces";
-import { PrintableString, Utf8String, OctetString } from "asn1js";
-
-import Attribute from "pkijs/src/Attribute";
-import AttributeTypeAndValue from "pkijs/src/AttributeTypeAndValue";
-import CertificationRequest from "pkijs/src/CertificationRequest"
-import Extension from "pkijs/src/Extension";
-import Extensions from "pkijs/src/Extensions";
 
 const crypto = new WebCrypto();
+
 const DEF_ALGO: RsaHashedKeyGenParams = {
     name: 'RSASSA-PKCS1-v1_5',
     modulusLength: 2048,
@@ -47,48 +46,48 @@ export default abstract class Crypto {
 
     public static async csr(params: ICsr_Params): Promise<ICsr_Result> {
 
-        const pkcs10 = new CertificationRequest();
+        const pkcs10 = new pkijs.CertificationRequest();
         pkcs10.version = 0;
 
         if (params.domain) {
-            pkcs10.subject.typesAndValues.push(new AttributeTypeAndValue({
+            pkcs10.subject.typesAndValues.push(new pkijs.AttributeTypeAndValue({
                 type: '2.5.4.3',
-                value: new Utf8String({ value: params.domain })
+                value: new asn1js.Utf8String({ value: params.domain })
             }));
         }
 
         if (params.country) {
-            pkcs10.subject.typesAndValues.push(new AttributeTypeAndValue({
+            pkcs10.subject.typesAndValues.push(new pkijs.AttributeTypeAndValue({
                 type: '2.5.4.6',
-                value: new PrintableString({ value: params.country })
+                value: new asn1js.PrintableString({ value: params.country })
             }));
         }
 
         if (params.town) {
-            pkcs10.subject.typesAndValues.push(new AttributeTypeAndValue({
+            pkcs10.subject.typesAndValues.push(new pkijs.AttributeTypeAndValue({
               type: "2.5.4.7",
-              value: new Utf8String({ value: params.town })
+              value: new asn1js.Utf8String({ value: params.town })
             }));
         }
 
         if (params.county) {
-            pkcs10.subject.typesAndValues.push(new AttributeTypeAndValue({
+            pkcs10.subject.typesAndValues.push(new pkijs.AttributeTypeAndValue({
               type: "2.5.4.8",
-              value: new Utf8String({ value: params.county })
+              value: new asn1js.Utf8String({ value: params.county })
             }));
         }
  
         if (params.department) {
-            pkcs10.subject.typesAndValues.push(new AttributeTypeAndValue({
+            pkcs10.subject.typesAndValues.push(new pkijs.AttributeTypeAndValue({
                 type: "2.5.4.10",
-                value: new Utf8String({ value: params.department })
+                value: new asn1js.Utf8String({ value: params.department })
             }));
         }
 
         if (params.company) {
-            pkcs10.subject.typesAndValues.push(new AttributeTypeAndValue({
+            pkcs10.subject.typesAndValues.push(new pkijs.AttributeTypeAndValue({
                 type: "2.5.4.11",
-                value: new Utf8String({ value: params.company })
+                value: new asn1js.Utf8String({ value: params.company })
             }));
         }
 
@@ -101,14 +100,14 @@ export default abstract class Crypto {
         //pubkeyhash_sha256 = await crypto.subtle.digest('SHA-256', toDigest);
         
         pkcs10.attributes = [];
-        pkcs10.attributes.push(new Attribute({
+        pkcs10.attributes.push(new pkijs.Attribute({
             type: "1.2.840.113549.1.9.14", // pkcs-9-at-extensionRequest
-            values: [(new Extensions({
+            values: [(new pkijs.Extensions({
             extensions_array: [
-                new Extension({
+                new pkijs.Extension({
                     extnID: "2.5.29.14",
                     critical: false,
-                    extnValue: (new OctetString({
+                    extnValue: (new asn1js.OctetString({
                         valueHex: pubkeyhash_sha1
                     })).toBER(false)
                 })
