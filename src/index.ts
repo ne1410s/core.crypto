@@ -1,13 +1,15 @@
 //import * as WebCrypto from "node-webcrypto-ossl";
-
-var asn1js = require('asn1js');
-var pkijs = require('pkijs');
-var WebCrypto = require("node-webcrypto-ossl");
-
 import Text from "@ne1410s/text";
 import { IKeyPair_Jwk, ICsr_Params, ICsr_Result } from "./interfaces";
 
-const crypto = new WebCrypto();
+var asn1js = require('asn1js');
+var pkijs = require('pkijs');
+var WebCrypto = require('node-webcrypto-ossl');
+
+var enjin = new pkijs.CryptoEngine();
+console.log(enjin);
+
+var cry = new WebCrypto();
 
 const DEF_ALGO: RsaHashedKeyGenParams = {
     name: 'RSASSA-PKCS1-v1_5',
@@ -20,18 +22,18 @@ export default abstract class Crypto {
 
     public static async gen(): Promise<IKeyPair_Jwk> {
 
-        const keys = await crypto.subtle.generateKey(DEF_ALGO, true, ['sign']);
+        const keys = await cry.subtle.generateKey(DEF_ALGO, true, ['sign']);
         return {
-            publicJwk: await crypto.subtle.exportKey('jwk', keys.publicKey),
-            privateJwk: await crypto.subtle.exportKey('jwk', keys.privateKey)
+            publicJwk: await cry.subtle.exportKey('jwk', keys.publicKey),
+            privateJwk: await cry.subtle.exportKey('jwk', keys.privateKey)
         };
     }
 
     public static async sign(text: string, privateJwk: JsonWebKey): Promise<string> {
 
-        const cKey = await crypto.subtle.importKey('jwk', privateJwk, DEF_ALGO, true, ['sign']),
+        const cKey = await cry.subtle.importKey('jwk', privateJwk, DEF_ALGO, true, ['sign']),
               buffer = Text.textToBuffer(text),
-              signed = await crypto.subtle.sign(DEF_ALGO.name, cKey, buffer);
+              signed = await cry.subtle.sign(DEF_ALGO.name, cKey, buffer);
 
         return Text.bufferToBase64Url(signed);
     }
@@ -39,7 +41,7 @@ export default abstract class Crypto {
     public static async digest(text: string): Promise<string> {
 
         const buffer = Text.textToBuffer(text),
-              digest = await crypto.subtle.digest('SHA-256', buffer);
+              digest = await cry.subtle.digest('SHA-256', buffer);
 
         return Text.bufferToBase64Url(digest);
     }
@@ -91,13 +93,17 @@ export default abstract class Crypto {
             }));
         }
 
-        const keys = await crypto.subtle.generateKey(DEF_ALGO, true, ['sign']);
+        const keys = await cry.subtle.generateKey(DEF_ALGO, true, ['sign']);
         const publicKey = keys.publicKey as CryptoKey;
+
+
+        pkijs.setEngine('cry', cry, cry.subtle);
+
         await pkcs10.subjectPublicKeyInfo.importKey(publicKey);
 
         var toDigest = pkcs10.subjectPublicKeyInfo.subjectPublicKey.valueBlock.valueHex;
-        var pubkeyhash_sha1 = await crypto.subtle.digest('SHA-1', toDigest);
-        //pubkeyhash_sha256 = await crypto.subtle.digest('SHA-256', toDigest);
+        var pubkeyhash_sha1 = await cry.subtle.digest('SHA-1', toDigest);
+        //pubkeyhash_sha256 = await cry.subtle.digest('SHA-256', toDigest);
         
         pkcs10.attributes = [];
         pkcs10.attributes.push(new pkijs.Attribute({
@@ -119,14 +125,14 @@ export default abstract class Crypto {
               signedPKCS10 = await pkcs10.sign(privateKey, 'SHA-256'),
               pkcs10_schema = pkcs10.toSchema(),
               pkcs10_encoded = pkcs10_schema.toBER(false),
-              exportedPkcs8 = await crypto.subtle.exportKey('pkcs8', keys.privateKey);
+              exportedPkcs8 = await cry.subtle.exportKey('pkcs8', keys.privateKey);
         
         return { 
             pem: Crypto.toPem(pkcs10_encoded, 'CERTIFICATE REQUEST'),
             der: Text.bufferToBase64Url(pkcs10_encoded),
             pkcs8: Crypto.toPem(exportedPkcs8, 'PRIVATE KEY'),
-            privateJwk: await crypto.subtle.exportKey('jwk', keys.privateKey),
-            publicJwk: await crypto.subtle.exportKey('jwk', keys.publicKey)
+            privateJwk: await cry.subtle.exportKey('jwk', keys.privateKey),
+            publicJwk: await cry.subtle.exportKey('jwk', keys.publicKey)
         };
     }
 

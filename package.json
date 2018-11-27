@@ -46,7 +46,6 @@
     "cross-env": "^5.2.0",
     "eslint": "^5.9.0",
     "mocha": "^5.2.0",
-    "node-webcrypto-ossl": "^1.0.38",
     "nyc": "^13.1.0",
     "rimraf": "^2.6.2",
     "typescript": "^3.1.6"
@@ -56,6 +55,8 @@
     "@babel/runtime": "^7.1.5",
     "@ne1410s/text": "0.0.4",
     "asn1js": "^2.0.21",
+    "node-webcrypto-ossl": "^1.0.38",
+    "node-webcrypto-shim": "0.0.0",
     "pkijs": "^2.1.72"
   }
 }
