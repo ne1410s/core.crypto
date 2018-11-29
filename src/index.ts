@@ -1,15 +1,13 @@
-import * as WebCrypto from "node-webcrypto-ossl";
+//import * as WebCrypto from "node-webcrypto-ossl";
 import Text from "@ne1410s/text";
 import { IKeyPair_Jwk, ICsr_Params, ICsr_Result } from "./interfaces";
-import { PrintableString, Utf8String, OctetString } from "asn1js";
 
-import Attribute from "pkijs/src/Attribute";
-import AttributeTypeAndValue from "pkijs/src/AttributeTypeAndValue";
-import CertificationRequest from "pkijs/src/CertificationRequest"
-import Extension from "pkijs/src/Extension";
-import Extensions from "pkijs/src/Extensions";
+var asn1js = require('asn1js')
+var pkijs = require('pkijs');
+var WebCrypto = require('node-webcrypto-ossl');
 
-const crypto = new WebCrypto();
+const webcrypto = new WebCrypto();
+
 const DEF_ALGO: RsaHashedKeyGenParams = {
     name: 'RSASSA-PKCS1-v1_5',
     modulusLength: 2048,
@@ -21,18 +19,18 @@ export default abstract class Crypto {
 
     public static async gen(): Promise<IKeyPair_Jwk> {
 
-        const keys = await crypto.subtle.generateKey(DEF_ALGO, true, ['sign']);
+        const keys = await webcrypto.subtle.generateKey(DEF_ALGO, true, ['sign']);
         return {
-            publicJwk: await crypto.subtle.exportKey('jwk', keys.publicKey),
-            privateJwk: await crypto.subtle.exportKey('jwk', keys.privateKey)
+            publicJwk: await webcrypto.subtle.exportKey('jwk', keys.publicKey),
+            privateJwk: await webcrypto.subtle.exportKey('jwk', keys.privateKey)
         };
     }
 
     public static async sign(text: string, privateJwk: JsonWebKey): Promise<string> {
 
-        const cKey = await crypto.subtle.importKey('jwk', privateJwk, DEF_ALGO, true, ['sign']),
+        const cKey = await webcrypto.subtle.importKey('jwk', privateJwk, DEF_ALGO, true, ['sign']),
               buffer = Text.textToBuffer(text),
-              signed = await crypto.subtle.sign(DEF_ALGO.name, cKey, buffer);
+              signed = await webcrypto.subtle.sign(DEF_ALGO.name, cKey, buffer);
 
         return Text.bufferToBase64Url(signed);
     }
@@ -40,75 +38,85 @@ export default abstract class Crypto {
     public static async digest(text: string): Promise<string> {
 
         const buffer = Text.textToBuffer(text),
-              digest = await crypto.subtle.digest('SHA-256', buffer);
+              digest = await webcrypto.subtle.digest('SHA-256', buffer);
 
         return Text.bufferToBase64Url(digest);
     }
 
     public static async csr(params: ICsr_Params): Promise<ICsr_Result> {
 
-        const pkcs10 = new CertificationRequest();
+        const pkcs10 = new pkijs.CertificationRequest();
         pkcs10.version = 0;
 
         if (params.domain) {
-            pkcs10.subject.typesAndValues.push(new AttributeTypeAndValue({
+            pkcs10.subject.typesAndValues.push(new pkijs.AttributeTypeAndValue({
                 type: '2.5.4.3',
-                value: new Utf8String({ value: params.domain })
+                value: new asn1js.Utf8String({ value: params.domain })
             }));
         }
 
         if (params.country) {
-            pkcs10.subject.typesAndValues.push(new AttributeTypeAndValue({
+            pkcs10.subject.typesAndValues.push(new pkijs.AttributeTypeAndValue({
                 type: '2.5.4.6',
-                value: new PrintableString({ value: params.country })
+                value: new asn1js.PrintableString({ value: params.country })
             }));
         }
 
         if (params.town) {
-            pkcs10.subject.typesAndValues.push(new AttributeTypeAndValue({
+            pkcs10.subject.typesAndValues.push(new pkijs.AttributeTypeAndValue({
               type: "2.5.4.7",
-              value: new Utf8String({ value: params.town })
+              value: new asn1js.Utf8String({ value: params.town })
             }));
         }
 
         if (params.county) {
-            pkcs10.subject.typesAndValues.push(new AttributeTypeAndValue({
+            pkcs10.subject.typesAndValues.push(new pkijs.AttributeTypeAndValue({
               type: "2.5.4.8",
-              value: new Utf8String({ value: params.county })
+              value: new asn1js.Utf8String({ value: params.county })
             }));
         }
  
         if (params.department) {
-            pkcs10.subject.typesAndValues.push(new AttributeTypeAndValue({
+            pkcs10.subject.typesAndValues.push(new pkijs.AttributeTypeAndValue({
                 type: "2.5.4.10",
-                value: new Utf8String({ value: params.department })
+                value: new asn1js.Utf8String({ value: params.department })
             }));
         }
 
         if (params.company) {
-            pkcs10.subject.typesAndValues.push(new AttributeTypeAndValue({
+            pkcs10.subject.typesAndValues.push(new pkijs.AttributeTypeAndValue({
                 type: "2.5.4.11",
-                value: new Utf8String({ value: params.company })
+                value: new asn1js.Utf8String({ value: params.company })
             }));
         }
 
-        const keys = await crypto.subtle.generateKey(DEF_ALGO, true, ['sign']);
+        const keys = await webcrypto.subtle.generateKey(DEF_ALGO, true, ['sign']);
         const publicKey = keys.publicKey as CryptoKey;
+
+
+        return {
+            pem: 'pem',
+            der: 'der',
+            pkcs8: 'pkcs8',
+            privateJwk: await webcrypto.subtle.exportKey('jwk', keys.privateKey),
+            publicJwk: await webcrypto.subtle.exportKey('jwk', keys.publicKey)
+        };
+
         await pkcs10.subjectPublicKeyInfo.importKey(publicKey);
 
         var toDigest = pkcs10.subjectPublicKeyInfo.subjectPublicKey.valueBlock.valueHex;
-        var pubkeyhash_sha1 = await crypto.subtle.digest('SHA-1', toDigest);
-        //pubkeyhash_sha256 = await crypto.subtle.digest('SHA-256', toDigest);
+        var pubkeyhash_sha1 = await webcrypto.subtle.digest('SHA-1', toDigest);
+        //pubkeyhash_sha256 = await webcrypto.subtle.digest('SHA-256', toDigest);
         
         pkcs10.attributes = [];
-        pkcs10.attributes.push(new Attribute({
+        pkcs10.attributes.push(new pkijs.Attribute({
             type: "1.2.840.113549.1.9.14", // pkcs-9-at-extensionRequest
-            values: [(new Extensions({
+            values: [(new pkijs.Extensions({
             extensions_array: [
-                new Extension({
+                new pkijs.Extension({
                     extnID: "2.5.29.14",
                     critical: false,
-                    extnValue: (new OctetString({
+                    extnValue: (new asn1js.OctetString({
                         valueHex: pubkeyhash_sha1
                     })).toBER(false)
                 })
@@ -120,14 +128,14 @@ export default abstract class Crypto {
               signedPKCS10 = await pkcs10.sign(privateKey, 'SHA-256'),
               pkcs10_schema = pkcs10.toSchema(),
               pkcs10_encoded = pkcs10_schema.toBER(false),
-              exportedPkcs8 = await crypto.subtle.exportKey('pkcs8', keys.privateKey);
+              exportedPkcs8 = await webcrypto.subtle.exportKey('pkcs8', keys.privateKey);
         
         return { 
             pem: Crypto.toPem(pkcs10_encoded, 'CERTIFICATE REQUEST'),
             der: Text.bufferToBase64Url(pkcs10_encoded),
             pkcs8: Crypto.toPem(exportedPkcs8, 'PRIVATE KEY'),
-            privateJwk: await crypto.subtle.exportKey('jwk', keys.privateKey),
-            publicJwk: await crypto.subtle.exportKey('jwk', keys.publicKey)
+            privateJwk: await webcrypto.subtle.exportKey('jwk', keys.privateKey),
+            publicJwk: await webcrypto.subtle.exportKey('jwk', keys.publicKey)
         };
     }
 
