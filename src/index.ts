@@ -1,16 +1,13 @@
-//import * as WebCrypto from "node-webcrypto-ossl";
+import * as WebCrypto from "node-webcrypto-ossl";
+import * as asn1js from "asn1js";
+
 import Text from "@ne1410s/text";
 import { IKeyPair_Jwk, ICsr_Params, ICsr_Result } from "./interfaces";
 
-var asn1js = require('asn1js')
 var pkijs = require('pkijs');
-var WebCrypto = require('node-webcrypto-ossl');
+var webcrypto = { subtle: new pkijs.CryptoEngine({subtle: new WebCrypto().subtle })};
 
-const webcrypto = new WebCrypto();
-const wce = new pkijs.CryptoEngine({ name: 'webce', crypto: webcrypto, subtle: webcrypto.subtle });
-
-
-pkijs.setEngine(wce.name, wce.crypto, wce);
+pkijs.setEngine('webcrypto', null, webcrypto.subtle);
 
 const DEF_ALGO: RsaHashedKeyGenParams = {
     name: 'RSASSA-PKCS1-v1_5',
