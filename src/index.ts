@@ -7,6 +7,10 @@ var pkijs = require('pkijs');
 var WebCrypto = require('node-webcrypto-ossl');
 
 const webcrypto = new WebCrypto();
+const wce = new pkijs.CryptoEngine({ name: 'webce', crypto: webcrypto, subtle: webcrypto.subtle });
+
+
+pkijs.setEngine(wce.name, wce.crypto, wce);
 
 const DEF_ALGO: RsaHashedKeyGenParams = {
     name: 'RSASSA-PKCS1-v1_5',
@@ -93,15 +97,6 @@ export default abstract class Crypto {
         const keys = await webcrypto.subtle.generateKey(DEF_ALGO, true, ['sign']);
         const publicKey = keys.publicKey as CryptoKey;
 
-
-        return {
-            pem: 'pem',
-            der: 'der',
-            pkcs8: 'pkcs8',
-            privateJwk: await webcrypto.subtle.exportKey('jwk', keys.privateKey),
-            publicJwk: await webcrypto.subtle.exportKey('jwk', keys.publicKey)
-        };
-
         await pkcs10.subjectPublicKeyInfo.importKey(publicKey);
 
         var toDigest = pkcs10.subjectPublicKeyInfo.subjectPublicKey.valueBlock.valueHex;
@@ -129,7 +124,7 @@ export default abstract class Crypto {
               pkcs10_schema = pkcs10.toSchema(),
               pkcs10_encoded = pkcs10_schema.toBER(false),
               exportedPkcs8 = await webcrypto.subtle.exportKey('pkcs8', keys.privateKey);
-        
+
         return { 
             pem: Crypto.toPem(pkcs10_encoded, 'CERTIFICATE REQUEST'),
             der: Text.bufferToBase64Url(pkcs10_encoded),
