@@ -1,11 +1,10 @@
 import * as WebCrypto from "node-webcrypto-ossl";
 import * as asn1js from "asn1js";
-
 import Text from "@ne1410s/text";
 import { IKeyPair_Jwk, ICsr_Params, ICsr_Result } from "./interfaces";
 
 var pkijs = require('pkijs');
-var webcrypto = { subtle: new pkijs.CryptoEngine({subtle: new WebCrypto().subtle })};
+const webcrypto = { subtle: new pkijs.CryptoEngine({subtle: new WebCrypto().subtle })};
 
 pkijs.setEngine('webcrypto', null, webcrypto.subtle);
 
