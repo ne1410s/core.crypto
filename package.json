@@ -40,7 +40,7 @@
     "typescript": "^3.1.6"
   },
   "dependencies": {
-    "@ne1410s/text": "0.0.5",
+    "@ne1410s/text": "0.0.6",
     "asn1js": "^2.0.21",
     "node-webcrypto-ossl": "^1.0.38",
     "pkijs": "^2.1.72"

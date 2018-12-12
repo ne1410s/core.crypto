@@ -26,9 +26,9 @@ describe('#signing', () => {
         expect(keys.privateJwk || '').to.not.equal('');
     });
 
-    it('should reproducibly sign text', async () => {
+    it('should correctly sign text', async () => {
         const sig = await ne14.crypto.sign('hello world', TEST_KEY);
-        expect(sig || '').to.equal('Ug_CoHjDr8Ovw4bDkcKWwpTCvcObSEjDjMKGA1gjw4Mqw6g6YwjCoMOOemIzwpVtw6cFVy3CiRzDvQ94woPDv3bCpkxlFMO4PsKpUMKJcmtgMzDCs8KFAsKoD3cFw5YrahQOwpXChMKrJwTDjiVGVsKheX_DrsK2wpFZw69LwoQ1wop5IcO8wqTCncO-MXHDmcOqbi_DgQHCtRgIw5HDrMKzw4ptEXDCtMKuwqBoScOSw5EhQTApwrAPUcKyw53DnSEpdVXDiSjCs8KIUMOaw47Csm1WwobColTDqw7Ch0w9w4fCpMOxL8KFw4rCi2jCncOVQXlJDcK6TC86HsK5HsKXZxNRCGY8OcOHw6Brwod_w6HCk8OjcDvCsT4bw4fCqMKjOMOxLy_Dp2RPw5xQOcODw617w5XDlXHDlzYrPEfDvwPCiMKlwqDCp8OINcKzZmbCuTdwPxHCpFHCu8KWBMOYwp1ewrIQw5cIE8KZGsOsLinChsOe');
+        expect(sig || '').to.equal('Ug-geO_vxtGWlL3bSEjMhgNYI8Mq6DpjCKDOemIzlW3nBVctiRz9D3iD_3amTGUU-D6pUIlya2AzMLOFAqgPdwXWK2oUDpWEqycEziVGVqF5f-62kVnvS4Q1inkh_KSd_jFx2epuL8EBtRgI0eyzym0RcLSuoGhJ0tEhQTApsA9Rst3dISl1Vckos4hQ2s6ybVaGolTrDodMPcek8S-FyotondVBeUkNukwvOh65HpdnE1EIZjw5x-Brh3_hk-NwO7E-G8eoozjxLy_nZE_cUDnD7XvV1XHXNis8R_8DiKWgp8g1s2ZmuTdwPxGkUbuWBNidXrIQ1wgTmRrsLimG3g');
     });
 
     it ('should create a csr', async () => {
