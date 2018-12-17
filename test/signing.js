@@ -32,7 +32,7 @@ describe('#signing', () => {
     });
 
     it ('should create a csr', async () => {
-        const params = { domain: 'test.org' },
+        const params = { domains: ['test.org', 'test.co.uk'] },
               sut = await ne14.crypto.csr(params);
 
         console.log(sut);

@@ -48,12 +48,12 @@ export default abstract class Crypto {
         const pkcs10 = new pkijs.CertificationRequest();
         pkcs10.version = 0;
 
-        if (params.domain) {
+        (params.domains || []).forEach(domain => {
             pkcs10.subject.typesAndValues.push(new pkijs.AttributeTypeAndValue({
                 type: '2.5.4.3',
-                value: new asn1js.Utf8String({ value: params.domain })
+                value: new asn1js.Utf8String({ value: domain })
             }));
-        }
+        });
 
         if (params.country) {
             pkcs10.subject.typesAndValues.push(new pkijs.AttributeTypeAndValue({
