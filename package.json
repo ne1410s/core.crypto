@@ -40,7 +40,7 @@
   "dependencies": {
     "@ne1410s/text": "^0.1.0",
     "asn1js": "^2.0.21",
-    "node-webcrypto-shim": "0.0.0",
+    "node-webcrypto-ossl": "^1.0.39",
     "pkijs": "^2.1.72"
   }
 }
