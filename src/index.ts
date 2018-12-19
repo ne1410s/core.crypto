@@ -1,12 +1,12 @@
-//import * as WebCrypto from "node-webcrypto-ossl";
 import * as asn1js from "asn1js";
 import { Text } from "@ne1410s/text";
 import { IKeyPair_Jwk, ICsr_Params, ICsr_Result } from "./interfaces";
 
+const crypto = require('node-webcrypto-shim');
+
 var pkijs = require('pkijs');
 
-//const webcrypto = { subtle: new pkijs.CryptoEngine({subtle: new WebCrypto().subtle })};
-//pkijs.setEngine('webcrypto', null, crypto.subtle); */
+pkijs.setEngine('crypto', null, crypto.subtle);
 
 const DEF_ALGO: RsaHashedKeyGenParams = {
     name: 'RSASSA-PKCS1-v1_5',
@@ -18,6 +18,8 @@ const DEF_ALGO: RsaHashedKeyGenParams = {
 export abstract class Crypto {
 
     public static async gen(): Promise<IKeyPair_Jwk> {
+
+        console.log('-----------------', crypto);
 
         const keys = await crypto.subtle.generateKey(DEF_ALGO, true, ['sign']);
         return {
