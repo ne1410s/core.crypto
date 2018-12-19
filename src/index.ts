@@ -8,7 +8,6 @@ var pkijs = require('pkijs');
 const webcrypto = { subtle: new pkijs.CryptoEngine({subtle: new WebCrypto().subtle })};
 pkijs.setEngine('crypto', null, webcrypto.subtle);
 
-
 const DEF_ALGO: RsaHashedKeyGenParams = {
     name: 'RSASSA-PKCS1-v1_5',
     modulusLength: 2048,
@@ -19,8 +18,6 @@ const DEF_ALGO: RsaHashedKeyGenParams = {
 export abstract class Crypto {
 
     public static async gen(): Promise<IKeyPair_Jwk> {
-
-        console.log('-----------------', webcrypto);
 
         const keys = await webcrypto.subtle.generateKey(DEF_ALGO, true, ['sign']);
         return {
