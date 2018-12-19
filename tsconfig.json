@@ -3,7 +3,7 @@
       "declaration": true,
       "declarationDir": "dist",
       "lib": ["dom", "es6"],
-      "module": "es6",
+      "module": "commonjs",
       "moduleResolution": "node",
       "noImplicitAny": true,
       "outDir": "dist",

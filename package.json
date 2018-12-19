@@ -10,7 +10,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "clean": "rimraf dist",
-    "build": "rollup -cm",
+    "build": "tsc",
     "test": "npm run clean && npm run build && mocha --exit",
     "publish-patch": "npm version patch && npm run test && npm publish --access public"
   },
@@ -30,17 +30,15 @@
   },
   "homepage": "https://github.com/ne1410s/ne14.crypto#readme",
   "devDependencies": {
+    "@types/node": "^10.12.18",
     "@types/pkijs": "0.0.1",
     "chai": "^4.2.0",
-    "eslint": "^5.9.0",
     "mocha": "^5.2.0",
     "rimraf": "^2.6.2",
-    "rollup": "^0.67.1",
-    "rollup-plugin-typescript2": "^0.18.0",
     "typescript": "^3.1.6"
   },
   "dependencies": {
-    "@ne1410s/text": "0.0.6",
+    "@ne1410s/text": "^0.1.0",
     "asn1js": "^2.0.21",
     "node-webcrypto-ossl": "^1.0.38",
     "pkijs": "^2.1.72"

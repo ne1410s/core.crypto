@@ -1,12 +1,12 @@
-import * as WebCrypto from "node-webcrypto-ossl";
+//import * as WebCrypto from "node-webcrypto-ossl";
 import * as asn1js from "asn1js";
-import Text from "@ne1410s/text";
+import { Text } from "@ne1410s/text";
 import { IKeyPair_Jwk, ICsr_Params, ICsr_Result } from "./interfaces";
 
 var pkijs = require('pkijs');
-const webcrypto = { subtle: new pkijs.CryptoEngine({subtle: new WebCrypto().subtle })};
 
-pkijs.setEngine('webcrypto', null, webcrypto.subtle);
+//const webcrypto = { subtle: new pkijs.CryptoEngine({subtle: new WebCrypto().subtle })};
+//pkijs.setEngine('webcrypto', null, crypto.subtle); */
 
 const DEF_ALGO: RsaHashedKeyGenParams = {
     name: 'RSASSA-PKCS1-v1_5',
@@ -15,22 +15,22 @@ const DEF_ALGO: RsaHashedKeyGenParams = {
     hash: { name: 'SHA-256' },
 };
 
-export default abstract class Crypto {
+export abstract class Crypto {
 
     public static async gen(): Promise<IKeyPair_Jwk> {
 
-        const keys = await webcrypto.subtle.generateKey(DEF_ALGO, true, ['sign']);
+        const keys = await crypto.subtle.generateKey(DEF_ALGO, true, ['sign']);
         return {
-            publicJwk: await webcrypto.subtle.exportKey('jwk', keys.publicKey),
-            privateJwk: await webcrypto.subtle.exportKey('jwk', keys.privateKey)
+            publicJwk: await crypto.subtle.exportKey('jwk', keys.publicKey),
+            privateJwk: await crypto.subtle.exportKey('jwk', keys.privateKey)
         };
     }
 
     public static async sign(text: string, privateJwk: JsonWebKey): Promise<string> {
 
-        const cKey = await webcrypto.subtle.importKey('jwk', privateJwk, DEF_ALGO, true, ['sign']),
+        const cKey = await crypto.subtle.importKey('jwk', privateJwk, DEF_ALGO, true, ['sign']),
               buffer = Text.textToBuffer(text),
-              signed = await webcrypto.subtle.sign(DEF_ALGO.name, cKey, buffer);
+              signed = await crypto.subtle.sign(DEF_ALGO.name, cKey, buffer);
 
         return Text.bufferToBase64Url(signed);
     }
@@ -38,7 +38,7 @@ export default abstract class Crypto {
     public static async digest(text: string): Promise<string> {
 
         const buffer = Text.textToBuffer(text),
-              digest = await webcrypto.subtle.digest('SHA-256', buffer);
+              digest = await crypto.subtle.digest('SHA-256', buffer);
 
         return Text.bufferToBase64Url(digest);
     }
@@ -90,14 +90,14 @@ export default abstract class Crypto {
             }));
         }
 
-        const keys = await webcrypto.subtle.generateKey(DEF_ALGO, true, ['sign']);
+        const keys = await crypto.subtle.generateKey(DEF_ALGO, true, ['sign']);
         const publicKey = keys.publicKey as CryptoKey;
 
         await pkcs10.subjectPublicKeyInfo.importKey(publicKey);
 
         var toDigest = pkcs10.subjectPublicKeyInfo.subjectPublicKey.valueBlock.valueHex;
-        var pubkeyhash_sha1 = await webcrypto.subtle.digest('SHA-1', toDigest);
-        //pubkeyhash_sha256 = await webcrypto.subtle.digest('SHA-256', toDigest);
+        var pubkeyhash_sha1 = await crypto.subtle.digest('SHA-1', toDigest);
+        //pubkeyhash_sha256 = await crypto.subtle.digest('SHA-256', toDigest);
         
         pkcs10.attributes = [];
         pkcs10.attributes.push(new pkijs.Attribute({
@@ -119,14 +119,14 @@ export default abstract class Crypto {
               signedPKCS10 = await pkcs10.sign(privateKey, 'SHA-256'),
               pkcs10_schema = pkcs10.toSchema(),
               pkcs10_encoded = pkcs10_schema.toBER(false),
-              exportedPkcs8 = await webcrypto.subtle.exportKey('pkcs8', keys.privateKey);
+              exportedPkcs8 = await crypto.subtle.exportKey('pkcs8', keys.privateKey);
 
         return { 
             pem: Crypto.toPem(pkcs10_encoded, 'CERTIFICATE REQUEST'),
             der: Text.bufferToBase64Url(pkcs10_encoded),
             pkcs8: Crypto.toPem(exportedPkcs8, 'PRIVATE KEY'),
-            privateJwk: await webcrypto.subtle.exportKey('jwk', keys.privateKey),
-            publicJwk: await webcrypto.subtle.exportKey('jwk', keys.publicKey)
+            privateJwk: await crypto.subtle.exportKey('jwk', keys.privateKey),
+            publicJwk: await crypto.subtle.exportKey('jwk', keys.publicKey)
         };
     }
 

@@ -1,7 +1,5 @@
 const expect = require('chai').expect;
-const ne14 = {
-    crypto: require('../dist/index')
-};
+const ne14 = require('../dist/index');
 
 const TEST_KEY = { 
     kty: 'RSA', 
@@ -21,19 +19,19 @@ const TEST_KEY = {
 describe('#signing', () => {
 
     it('should generate a key pair', async () => {
-        const keys = await ne14.crypto.gen();
+        const keys = await ne14.Crypto.gen();
         expect(keys.publicJwk || '').to.not.equal('');
         expect(keys.privateJwk || '').to.not.equal('');
     });
 
     it('should correctly sign text', async () => {
-        const sig = await ne14.crypto.sign('hello world', TEST_KEY);
+        const sig = await ne14.Crypto.sign('hello world', TEST_KEY);
         expect(sig || '').to.equal('Ug-geO_vxtGWlL3bSEjMhgNYI8Mq6DpjCKDOemIzlW3nBVctiRz9D3iD_3amTGUU-D6pUIlya2AzMLOFAqgPdwXWK2oUDpWEqycEziVGVqF5f-62kVnvS4Q1inkh_KSd_jFx2epuL8EBtRgI0eyzym0RcLSuoGhJ0tEhQTApsA9Rst3dISl1Vckos4hQ2s6ybVaGolTrDodMPcek8S-FyotondVBeUkNukwvOh65HpdnE1EIZjw5x-Brh3_hk-NwO7E-G8eoozjxLy_nZE_cUDnD7XvV1XHXNis8R_8DiKWgp8g1s2ZmuTdwPxGkUbuWBNidXrIQ1wgTmRrsLimG3g');
     });
 
     it ('should create a csr', async () => {
         const params = { domains: ['test.org', 'test.co.uk'] },
-              sut = await ne14.crypto.csr(params);
+              sut = await ne14.Crypto.csr(params);
 
         console.log(sut);
     });
