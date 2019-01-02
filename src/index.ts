@@ -129,6 +129,61 @@ export abstract class Crypto {
             publicJwk: await webcrypto.subtle.exportKey('jwk', keys.publicKey)
         };
     }
+    
+    //https://github.com/PeculiarVentures/PKI.js/blob/master/examples/PKCS12SimpleExample/es6.js
+    public static pfx(base64_cer: string, base64_key: string, password: string, hash: string = 'SHA-256'): Promise<ArrayBuffer> {
+
+        const ber_cer = Text.textToBuffer(Text.base64ToText(base64_cer)),
+              ber_key = Text.textToBuffer(Text.base64ToText(base64_key));
+
+        const asn1_cer = asn1js.fromBER(ber_cer),
+              asn1_key = asn1js.fromBER(ber_key);
+
+        const objc_cer = new pkijs.Certificate({ schema: asn1_cer.result }),
+              objc_key = new pkijs.PrivateKeyInfo({ schema: asn1_key.result });
+
+        const pkcs12 = new pkijs.PFX({
+            parsedValue: {
+                integrityMode: 0, // Password-Based Integrity Mode
+                authenticatedSafe: new pkijs.AuthenticatedSafe({
+                    parsedValue: {
+                        safeContents: [
+                            {
+                                privacyMode: 0, // "No Privacy" mode
+                                value: new pkijs.SafeContents({
+                                    safeBags: [
+                                        new pkijs.SafeBag({
+                                            bagId: "1.2.840.113549.1.12.10.1.1",
+                                            bagValue: objc_key
+                                        }),
+                                        new pkijs.SafeBag({
+                                            bagId: "1.2.840.113549.1.12.10.1.3",
+                                            bagValue: new pkijs.CertBag({
+                                                parsedValue: objc_cer
+                                            })
+                                        })
+                                    ]
+                                })
+                            }
+                        ]
+                    }
+                })
+            }
+        });
+
+        pkcs12.parsedValue.authenticatedSafe.makeInternalValues({
+			safeContents: [{ /* Empty as "No Privacy" for SafeContents */ }]
+        });
+        
+        pkcs12.makeInternalValues({
+            password: Text.textToBuffer(password),
+			iterations: 100000,
+			pbkdf2HashAlgorithm: hash,
+			hmacHashAlgorithm: hash
+        });
+
+        return pkcs12.toSchema().toBER(false);
+    }
 
     private static toPem(pkcs10_buf: ArrayBuffer, title: string): string {
 
