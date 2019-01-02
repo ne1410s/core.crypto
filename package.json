@@ -9,7 +9,7 @@
   ],
   "types": "dist/index.d.ts",
   "scripts": {
-    "clean": "rimraf dist",
+    "clean": "rimraf dist && rimraf test/**/*.p12",
     "build": "tsc",
     "test": "npm run clean && npm run build && mocha --exit",
     "publish-patch": "npm version patch && npm run test && npm publish --access public"

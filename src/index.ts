@@ -5,8 +5,8 @@ import { IKeyPair_Jwk, ICsr_Params, ICsr_Result } from "./interfaces";
 
 var pkijs = require('pkijs');
 
-const webcrypto = { subtle: new pkijs.CryptoEngine({subtle: new WebCrypto().subtle })};
-pkijs.setEngine('crypto', null, webcrypto.subtle);
+const webcrypto = new WebCrypto();
+pkijs.setEngine("newEngine", webcrypto, new pkijs.CryptoEngine({ name: "", crypto: webcrypto, subtle: webcrypto.subtle }));
 
 const DEF_ALGO: RsaHashedKeyGenParams = {
     name: 'RSASSA-PKCS1-v1_5',
@@ -131,13 +131,10 @@ export abstract class Crypto {
     }
     
     //https://github.com/PeculiarVentures/PKI.js/blob/master/examples/PKCS12SimpleExample/es6.js
-    public static pfx(base64_cer: string, base64_key: string, password: string, hash: string = 'SHA-256'): Promise<ArrayBuffer> {
+    public static async pfx(cert_b64: string, key_b64: string, password: string, hash: string = 'SHA-256'): Promise<ArrayBuffer> {
 
-        const ber_cer = Text.textToBuffer(Text.base64ToText(base64_cer)),
-              ber_key = Text.textToBuffer(Text.base64ToText(base64_key));
-
-        const asn1_cer = asn1js.fromBER(ber_cer),
-              asn1_key = asn1js.fromBER(ber_key);
+        const asn1_cer = asn1js.fromBER(Text.textToBuffer(Text.base64ToText(cert_b64))),
+              asn1_key = asn1js.fromBER(Text.textToBuffer(Text.base64ToText(key_b64)));
 
         const objc_cer = new pkijs.Certificate({ schema: asn1_cer.result }),
               objc_key = new pkijs.PrivateKeyInfo({ schema: asn1_key.result });
@@ -171,11 +168,11 @@ export abstract class Crypto {
             }
         });
 
-        pkcs12.parsedValue.authenticatedSafe.makeInternalValues({
+        await pkcs12.parsedValue.authenticatedSafe.makeInternalValues({
 			safeContents: [{ /* Empty as "No Privacy" for SafeContents */ }]
         });
         
-        pkcs12.makeInternalValues({
+        await pkcs12.makeInternalValues({
             password: Text.textToBuffer(password),
 			iterations: 100000,
 			pbkdf2HashAlgorithm: hash,

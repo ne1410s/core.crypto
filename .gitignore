@@ -63,3 +63,5 @@ typings/
 /.rpt2_cache
 
 /dist
+
+/test/**/*.p12
