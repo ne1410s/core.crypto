@@ -17,12 +17,13 @@ const DEF_ALGO: RsaHashedKeyGenParams = {
 
 export abstract class Crypto {
 
-    public static async randomString(length: number = 32): Promise<string> {
+    public static async randomString(): Promise<string> {
         
-        const bytes = new Uint8Array(length);
+        const bytes = new Uint8Array(24);
         webcrypto.getRandomValues(bytes);
 
-        return Text.bufferToText(bytes.buffer);
+        return Text.bufferToBase64Url(bytes.buffer);
+
     }
 
     public static async gen(): Promise<IKeyPair_Jwk> {
