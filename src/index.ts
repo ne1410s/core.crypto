@@ -17,6 +17,14 @@ const DEF_ALGO: RsaHashedKeyGenParams = {
 
 export abstract class Crypto {
 
+    public static async randomString(length: number = 32): Promise<string> {
+        
+        const bytes = new Uint8Array(length);
+        webcrypto.getRandomValues(bytes);
+
+        return Text.bufferToText(bytes.buffer);
+    }
+
     public static async gen(): Promise<IKeyPair_Jwk> {
 
         const keys = await webcrypto.subtle.generateKey(DEF_ALGO, true, ['sign']);

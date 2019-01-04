@@ -47,4 +47,12 @@ describe('#signing', () => {
         fs.appendFileSync('test/test-cert.p12', Buffer.from(sut), err => console.log(err));
 
     }).timeout(0);
+
+    it ('should generate a random string', async () => {
+
+        const len = 16,
+              sut = await ne14.Crypto.randomString(len);
+        
+        expect(sut.length).to.equal(len);
+    });
 });
