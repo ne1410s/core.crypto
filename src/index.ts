@@ -133,7 +133,8 @@ export abstract class Crypto {
         return { 
             pem: Crypto.toPem(pkcs10_encoded, 'CERTIFICATE REQUEST'),
             der: Text.bufferToBase64Url(pkcs10_encoded),
-            pkcs8: Crypto.toPem(exportedPkcs8, 'PRIVATE KEY'),
+            pkcs8_pem: Crypto.toPem(exportedPkcs8, 'PRIVATE KEY'),
+            pkcs8_b64: Text.bufferToBase64(exportedPkcs8),
             privateJwk: await webcrypto.subtle.exportKey('jwk', keys.privateKey),
             publicJwk: await webcrypto.subtle.exportKey('jwk', keys.publicKey)
         };
