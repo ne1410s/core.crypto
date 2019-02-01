@@ -52,17 +52,16 @@ export abstract class Crypto {
         return Text.bufferToBase64Url(digest);
     }
 
+    //https://github.com/PeculiarVentures/PKI.js/blob/master/examples/PKCS10ComplexExample/es6.js
     public static async csr(params: ICsr_Params): Promise<ICsr_Result> {
 
         const pkcs10 = new pkijs.CertificationRequest();
         pkcs10.version = 0;
-
-        (params.domains || []).forEach(domain => {
-            pkcs10.subject.typesAndValues.push(new pkijs.AttributeTypeAndValue({
-                type: '2.5.4.3',
-                value: new asn1js.Utf8String({ value: domain })
-            }));
-        });
+    
+        pkcs10.subject.typesAndValues.push(new pkijs.AttributeTypeAndValue({
+            type: '2.5.4.3',
+            value: new asn1js.PrintableString({ value: params.domains[0] })
+        }));
 
         if (params.country) {
             pkcs10.subject.typesAndValues.push(new pkijs.AttributeTypeAndValue({
@@ -85,17 +84,17 @@ export abstract class Crypto {
             }));
         }
  
-        if (params.department) {
+        if (params.company) {
             pkcs10.subject.typesAndValues.push(new pkijs.AttributeTypeAndValue({
                 type: "2.5.4.10",
-                value: new asn1js.Utf8String({ value: params.department })
+                value: new asn1js.Utf8String({ value: params.company })
             }));
         }
 
-        if (params.company) {
+        if (params.department) {
             pkcs10.subject.typesAndValues.push(new pkijs.AttributeTypeAndValue({
                 type: "2.5.4.11",
-                value: new asn1js.Utf8String({ value: params.company })
+                value: new asn1js.Utf8String({ value: params.department })
             }));
         }
 
@@ -107,20 +106,27 @@ export abstract class Crypto {
         var toDigest = pkcs10.subjectPublicKeyInfo.subjectPublicKey.valueBlock.valueHex;
         var pubkeyhash_sha1 = await webcrypto.subtle.digest('SHA-1', toDigest);
         //pubkeyhash_sha256 = await webcrypto.subtle.digest('SHA-256', toDigest);
-        
+
         pkcs10.attributes = [];
         pkcs10.attributes.push(new pkijs.Attribute({
             type: "1.2.840.113549.1.9.14", // pkcs-9-at-extensionRequest
             values: [(new pkijs.Extensions({
-            extensions_array: [
-                new pkijs.Extension({
-                    extnID: "2.5.29.14",
-                    critical: false,
-                    extnValue: (new asn1js.OctetString({
-                        valueHex: pubkeyhash_sha1
-                    })).toBER(false)
-                })
-            ]
+                extensions: [
+                    new pkijs.Extension({
+                        extnID: "2.5.29.14",
+                        critical: false,
+                        extnValue: new asn1js.OctetString({ valueHex: pubkeyhash_sha1 }).toBER(false)
+                    }),
+                    new pkijs.Extension({
+                        extnID: "2.5.29.17",
+                        critical: false,
+                        extnValue: new pkijs.GeneralNames({
+                            names: params.domains.map(dom => new pkijs.GeneralName({
+                                type: 2, value: dom
+                            }))
+                        }).toSchema().toBER(false)
+                    })
+                ]
             })).toSchema()]
         }));
         
@@ -141,7 +147,7 @@ export abstract class Crypto {
     }
     
     //https://github.com/PeculiarVentures/PKI.js/blob/master/examples/PKCS12SimpleExample/es6.js
-    public static async pfx(cert_b64: string, key_b64: string, password: string, hash: string = 'SHA-256'): Promise<ArrayBuffer> {
+    public static async pfx(friendlyName: string, cert_b64: string, key_b64: string, password: string, hash: string = 'SHA-256'): Promise<ArrayBuffer> {
 
         const asn1_cer = asn1js.fromBER(Text.textToBuffer(Text.base64ToText(cert_b64))),
               asn1_key = asn1js.fromBER(Text.textToBuffer(Text.base64ToText(key_b64)));
@@ -167,7 +173,15 @@ export abstract class Crypto {
                                             bagId: "1.2.840.113549.1.12.10.1.3",
                                             bagValue: new pkijs.CertBag({
                                                 parsedValue: objc_cer
-                                            })
+                                            }),
+                                            bagAttributes: [
+                                                new pkijs.Attribute({
+                                                    type: "1.2.840.113549.1.9.20", // friendlyName
+                                                    values: [
+                                                        new asn1js.BmpString({value: friendlyName})
+                                                    ]
+                                                })
+                                            ]
                                         })
                                     ]
                                 })
