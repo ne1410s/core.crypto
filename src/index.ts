@@ -59,13 +59,13 @@ export abstract class Crypto {
         pkcs10.version = 0;
     
         pkcs10.subject.typesAndValues.push(new pkijs.AttributeTypeAndValue({
-            type: '2.5.4.3',
+            type: '2.5.4.3', // CN=
             value: new asn1js.PrintableString({ value: params.domains[0] })
         }));
 
         if (params.country) {
             pkcs10.subject.typesAndValues.push(new pkijs.AttributeTypeAndValue({
-                type: '2.5.4.6',
+                type: '2.5.4.6', // C=
                 value: new asn1js.PrintableString({ value: params.country })
             }));
         }
@@ -73,28 +73,28 @@ export abstract class Crypto {
         if (params.town) {
             pkcs10.subject.typesAndValues.push(new pkijs.AttributeTypeAndValue({
               type: "2.5.4.7",
-              value: new asn1js.Utf8String({ value: params.town })
+              value: new asn1js.PrintableString({ value: params.town })
             }));
         }
 
         if (params.county) {
             pkcs10.subject.typesAndValues.push(new pkijs.AttributeTypeAndValue({
               type: "2.5.4.8",
-              value: new asn1js.Utf8String({ value: params.county })
+              value: new asn1js.PrintableString({ value: params.county })
             }));
         }
  
         if (params.company) {
             pkcs10.subject.typesAndValues.push(new pkijs.AttributeTypeAndValue({
-                type: "2.5.4.10",
-                value: new asn1js.Utf8String({ value: params.company })
+                type: "2.5.4.10", // O=
+                value: new asn1js.PrintableString({ value: params.company })
             }));
         }
 
         if (params.department) {
             pkcs10.subject.typesAndValues.push(new pkijs.AttributeTypeAndValue({
-                type: "2.5.4.11",
-                value: new asn1js.Utf8String({ value: params.department })
+                type: "2.5.4.11", // OU=
+                value: new asn1js.PrintableString({ value: params.department })
             }));
         }
 

@@ -35,7 +35,7 @@ describe('#signing', () => {
             domains: ['test.org', 'test.co.uk', 'thingz.biz'],
             company: 'TestCo',
             department: 'Things',
-            country: 'Neverland',
+            country: 'US',
         });
 
         console.log(sut);
