@@ -72,14 +72,14 @@ export abstract class Crypto {
 
         if (params.town) {
             pkcs10.subject.typesAndValues.push(new pkijs.AttributeTypeAndValue({
-              type: "2.5.4.7",
+              type: "2.5.4.7", // L=
               value: new asn1js.PrintableString({ value: params.town })
             }));
         }
 
         if (params.county) {
             pkcs10.subject.typesAndValues.push(new pkijs.AttributeTypeAndValue({
-              type: "2.5.4.8",
+              type: "2.5.4.8", // S=
               value: new asn1js.PrintableString({ value: params.county })
             }));
         }
@@ -137,9 +137,9 @@ export abstract class Crypto {
               exportedPkcs8 = await webcrypto.subtle.exportKey('pkcs8', keys.privateKey);
 
         return { 
-            pem: Crypto.toPem(pkcs10_encoded, 'CERTIFICATE REQUEST'),
+            pem: Crypto.bufferToPem(pkcs10_encoded, 'CERTIFICATE REQUEST'),
             der: Text.bufferToBase64Url(pkcs10_encoded),
-            pkcs8_pem: Crypto.toPem(exportedPkcs8, 'PRIVATE KEY'),
+            pkcs8_pem: Crypto.bufferToPem(exportedPkcs8, 'PRIVATE KEY'),
             pkcs8_b64: Text.bufferToBase64(exportedPkcs8),
             privateJwk: await webcrypto.subtle.exportKey('jwk', keys.privateKey),
             publicJwk: await webcrypto.subtle.exportKey('jwk', keys.publicKey)
@@ -206,17 +206,30 @@ export abstract class Crypto {
         return pkcs12.toSchema().toBER(false);
     }
 
-    private static toPem(pkcs10_buf: ArrayBuffer, title: string): string {
+    public static pemToBase64Parts(pem: string): Array<string> {
 
-        const pem_string = btoa(Text.bufferToText(pkcs10_buf)),
-              string_length = pem_string.length;
+        return pem.split(/-----[\w\s]+-----/)
+            .map(p => p.replace(/\s/g, ''))
+            .filter(p => p);
+    }
+
+    public static base64ToPem(base64: string, title: string): string {
+
+        const string_length = base64.length;
 
         let result_string = '';
         for (var i = 0, count = 0; i < string_length; i++, count++) {
             if (count > 63) { result_string += "\r\n"; count = 0; }
-            result_string += pem_string[i];
+            result_string += base64[i];
         }
 
+        title = (title || '').replace(/[^\w\s]+/, '').trim().toUpperCase() || 'CERTIFICATE';
         return `-----BEGIN ${title}-----\r\n${result_string}\r\n-----END ${title}-----\r\n`;
+    }
+  
+    private static bufferToPem(pkcs10_buf: ArrayBuffer, title: string): string {
+
+        const base64 = Text.bufferToBase64(pkcs10_buf);
+        return Crypto.base64ToPem(base64, title);
     }
 }

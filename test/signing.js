@@ -33,9 +33,11 @@ describe('#signing', () => {
     it('should create a csr', async () => {        
         const sut = await ne14.Crypto.csr({
             domains: ['test.org', 'test.co.uk', 'thingz.biz'],
+            county: 'Shropshire',
+            town: 'Salisbury',
             company: 'TestCo',
             department: 'Things',
-            country: 'US',
+            country: 'UK'
         });
 
         console.log(sut);
@@ -51,6 +53,19 @@ describe('#signing', () => {
         fs.appendFileSync('test/test-cert.p12', Buffer.from(sut), err => console.log(err));
 
     }).timeout(0);
+
+    it('should format base 64 as pem and vice versa', async () => {
+        const b64 = 'MIIDRDCCAi6gAwIBAgIBATALBgkqhkiG9w0BAQswODE2MAkGA1UEBhMCVVMwKQYDVQQDHiIAUABlAGMAdQBsAGkAYQByACAAVgBlAG4AdAB1AHIAZQBzMB4XDTEzMDEzMTIxMDAwMFoXDTE2MDEzMTIxMDAwMFowODE2MAkGA1UEBhMCVVMwKQYDVQQDHiIAUABlAGMAdQBsAGkAYQByACAAVgBlAG4AdAB1AHIAZQBzMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4qEnCuFxZqTEM/8cYcaYxexT6+fAHan5/eGCFOe1Yxi0BjRuDooWBPX71+hmWK/MKrKpWTpA3ZDeWrQR2WIcaf/ypd6DAEEWWzlQgBYpEUj/o7cykNwIvZReU9JXCbZu0EmeZXzBm1mIcWYRdk17UdneIRUkU379wVJcKXKlgZsx8395UNeOMk11G5QaHzAafQ1ljEKB/x2xDgwFxNaKpSIq3LQFq0PxoYt/PBJDMfUSiWT5cFh1FdKITXQzxnIthFn+NVKicAWBRaSZCRQxcShX6KHpQ1Lmk0/7QoCcDOAmVSfUAaBl2w8bYpnobFSStyY0RJHBqNtnTV3JonGAHwIDAQABo10wWzAMBgNVHRMEBTADAQH/MAsGA1UdDwQEAwIA/zAdBgNVHQ4EFgQU5QmA6U960XL4SII2SEhCcxij0JYwHwYDVR0jBBgwFoAU5QmA6U960XL4SII2SEhCcxij0JYwCwYJKoZIhvcNAQELA4IBAQAikQls3LhY8rYQCZ+8jXrdaRTY3L5J3S2xzoAofkEnQNzNMClaWrZbY/KQ+gG25MIFwPOWZn/uYUKB2j0yHTRMPEAp/v5wawSqM2BkdnkGP4r5Etx9pe3mog2xNUBqSeopNNto7QgV0o1yYHtuMKQhNAzcFB1CGz25+lXv8VuuU1PoYNrTjiprkjLDgPurNXUjUh9AZl06+Cakoe75LEkuaZKuBQIMNLJFcM2ZSK/QAAaI0E1DovcsCctW8x/6Qk5fYwNu0jcIdng9dzKYXytzV53+OGxdK5mldyBBkyvTrbO8bWwYT3c+weB1huNpgnpRHJKMz5xVj0bbdnHir6uc',
+              sut = await ne14.Crypto.base64ToPem(b64, '  wowzers ');
+
+        expect(sut.indexOf('-----BEGIN WOWZERS-----')).to.equal(0);
+
+        const sut2 = `\r\n${sut}\r\n\r\n${sut}\r\n`,
+              e2e = ne14.Crypto.pemToBase64Parts(sut2);
+
+        expect(e2e.length).to.equal(2);
+        expect(e2e[1].indexOf('MIIDRDCCAi6gAwIBAgIBATA')).to.equal(0);
+    });
 
     it ('should generate a random string', async () => {
         const sut = await ne14.Crypto.randomString();
