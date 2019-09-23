@@ -30,17 +30,17 @@
   },
   "homepage": "https://github.com/ne1410s/ne14.crypto#readme",
   "devDependencies": {
-    "@types/node": "^10.12.18",
+    "@types/node": "^10.14.18",
     "@types/pkijs": "0.0.1",
     "chai": "^4.2.0",
     "mocha": "^5.2.0",
-    "rimraf": "^2.6.2",
-    "typescript": "^3.1.6"
+    "rimraf": "^2.7.1",
+    "typescript": "^3.6.3"
   },
   "dependencies": {
     "@ne1410s/text": "^0.1.2",
-    "asn1js": "^2.0.21",
+    "asn1js": "^2.0.26",
     "node-webcrypto-ossl": "^1.0.39",
-    "pkijs": "^2.1.72"
+    "pkijs": "^2.1.82"
   }
 }
