@@ -1,46 +1,55 @@
 {
   "name": "@ne1410s/crypto",
-  "version": "0.1.8",
-  "description": "ES Crypto Utilities",
-  "main": "dist/index.js",
-  "module": "dist/index.es.js",
+  "version": "0.2.0",
+  "description": "Lightweight ES5 script to provide crypto utilities",
+  "main": "dist/ne14_crypto.cjs.min.js",
+  "module": "dist/ne14_crypto.esm.min.js",
+  "browser": "dist/ne14_crypto.umd.min.js",
+  "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
-  "types": "dist/index.d.ts",
   "scripts": {
-    "clean": "rimraf dist && rimraf test/**/*.p12",
-    "build": "tsc",
-    "test": "npm run clean && npm run build && mocha --exit",
-    "publish-patch": "npm version patch && npm run test && npm publish --access public"
+    "dev": "npx rollup -c rollup.browser.config.js -m -w",
+    "clean": "npx rimraf dist && rimraf test/**/*.p12",
+    "build": "npm run clean && npx rollup -c",
+    "test": "npm run build && mocha --exit",
+    "publish-local": "npm run build && npm pack",
+    "publish-patch": "npm run build && npm version patch && npm publish --access public",
+    "publish-minor": "npm run build && npm version minor && npm publish --access public",
+    "publish-major": "npm run build && npm version major && npm publish --access public"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ne1410s/ne14.crypto.git"
   },
   "keywords": [
-    "ES",
+    "ES5",
     "Crypto",
-    "Utilities"
+    "Utils"
   ],
   "author": "ne1410s <pgj646@gmail.com> (http://ne1410s.co.uk)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/ne1410s/ne14.crypto/issues"
   },
-  "homepage": "https://github.com/ne1410s/ne14.crypto#readme",
   "devDependencies": {
-    "@types/node": "^10.14.18",
-    "@types/pkijs": "0.0.1",
+    "@rollup/plugin-commonjs": "^11.0.2",
+    "@rollup/plugin-node-resolve": "^7.1.1",
+    "@rollup/plugin-typescript": "^4.0.0",
+    "@types/pkijs": "0.0.3",
     "chai": "^4.2.0",
-    "mocha": "^5.2.0",
-    "rimraf": "^2.7.1",
-    "typescript": "^3.6.3"
+    "mocha": "^7.1.1",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.3.0",
+    "rollup-plugin-terser": "^5.3.0",
+    "rollup-plugin-typescript2": "^0.27.0",
+    "typescript": "^3.8.3"
   },
   "dependencies": {
-    "@ne1410s/text": "^0.1.2",
+    "@ne1410s/text": "^0.2.0",
     "asn1js": "^2.0.26",
-    "node-webcrypto-ossl": "^1.0.39",
-    "pkijs": "^2.1.82"
+    "node-webcrypto-ossl": "^2.0.1",
+    "pkijs": "^2.1.87"
   }
 }
