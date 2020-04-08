@@ -6,7 +6,8 @@ import pkg from './package.json';
 export default {
   input: 'src/index.ts',
   external: [
-    '@ne1410s/text'
+    'asn1js',
+    '@ne1410s/text',
   ],
   output: [
     { file: pkg.main, format: 'cjs' },

@@ -1,12 +1,12 @@
-//import * as WebCrypto from "node-webcrypto-ossl";
-import * as asn1js from "asn1js";
-import * as ne_text from "@ne1410s/text";
-import { IKeyPair_Jwk, ICsr_Params, ICsr_Result } from "./interfaces";
+import * as WebCrypto from 'node-webcrypto-ossl';
+import * as asn1js from 'asn1js';
+import * as ne_text from '@ne1410s/text';
+import { IKeyPair_Jwk, ICsr_Params, ICsr_Result } from './interfaces';
 
 var pkijs = require('pkijs');
 
-//const webcrypto = new WebCrypto();
-//pkijs.setEngine("newEngine", webcrypto, new pkijs.CryptoEngine({ name: "", crypto: webcrypto, subtle: webcrypto.subtle }));
+const webcrypto = new WebCrypto();
+pkijs.setEngine('newEngine', webcrypto, new pkijs.CryptoEngine({ name: '', crypto: webcrypto, subtle: webcrypto.subtle }));
 
 const DEF_ALGO: RsaHashedKeyGenParams = {
     name: 'RSASSA-PKCS1-v1_5',
@@ -18,26 +18,25 @@ const DEF_ALGO: RsaHashedKeyGenParams = {
 export async function randomString(): Promise<string> {
     
     const bytes = new Uint8Array(24);
-    crypto.getRandomValues(bytes);
+    webcrypto.getRandomValues(bytes);
 
     return ne_text.bufferToBase64Url(bytes.buffer);
-
 }
 
 export async function gen(): Promise<IKeyPair_Jwk> {
 
-    const keys = await crypto.subtle.generateKey(DEF_ALGO, true, ['sign']);
+    const keys = await webcrypto.subtle.generateKey(DEF_ALGO, true, ['sign']);
     return {
-        publicJwk: await crypto.subtle.exportKey('jwk', keys.publicKey),
-        privateJwk: await crypto.subtle.exportKey('jwk', keys.privateKey)
+        publicJwk: await webcrypto.subtle.exportKey('jwk', keys.publicKey),
+        privateJwk: await webcrypto.subtle.exportKey('jwk', keys.privateKey)
     };
 }
 
 export async function sign(text: string, privateJwk: JsonWebKey): Promise<string> {
 
-    const cKey = await crypto.subtle.importKey('jwk', privateJwk, DEF_ALGO, true, ['sign']),
+    const cKey = await webcrypto.subtle.importKey('jwk', privateJwk, DEF_ALGO, true, ['sign']),
             buffer = ne_text.textToBuffer(text),
-            signed = await crypto.subtle.sign(DEF_ALGO.name, cKey, buffer);
+            signed = await webcrypto.subtle.sign(DEF_ALGO.name, cKey, buffer);
 
     return ne_text.bufferToBase64Url(signed);
 }
@@ -45,7 +44,7 @@ export async function sign(text: string, privateJwk: JsonWebKey): Promise<string
 export async function digest(text: string): Promise<string> {
 
     const buffer = ne_text.textToBuffer(text),
-            digest = await crypto.subtle.digest('SHA-256', buffer);
+            digest = await webcrypto.subtle.digest('SHA-256', buffer);
 
     return ne_text.bufferToBase64Url(digest);
 }
@@ -70,53 +69,53 @@ export async function csr(params: ICsr_Params): Promise<ICsr_Result> {
 
     if (params.town) {
         pkcs10.subject.typesAndValues.push(new pkijs.AttributeTypeAndValue({
-            type: "2.5.4.7", // L=
+            type: '2.5.4.7', // L=
             value: new asn1js.PrintableString({ value: params.town })
         }));
     }
 
     if (params.county) {
         pkcs10.subject.typesAndValues.push(new pkijs.AttributeTypeAndValue({
-            type: "2.5.4.8", // S=
+            type: '2.5.4.8', // S=
             value: new asn1js.PrintableString({ value: params.county })
         }));
     }
 
     if (params.company) {
         pkcs10.subject.typesAndValues.push(new pkijs.AttributeTypeAndValue({
-            type: "2.5.4.10", // O=
+            type: '2.5.4.10', // O=
             value: new asn1js.PrintableString({ value: params.company })
         }));
     }
 
     if (params.department) {
         pkcs10.subject.typesAndValues.push(new pkijs.AttributeTypeAndValue({
-            type: "2.5.4.11", // OU=
+            type: '2.5.4.11', // OU=
             value: new asn1js.PrintableString({ value: params.department })
         }));
     }
 
-    const keys = await crypto.subtle.generateKey(DEF_ALGO, true, ['sign']);
+    const keys = await webcrypto.subtle.generateKey(DEF_ALGO, true, ['sign']);
     const publicKey = keys.publicKey as CryptoKey;
 
     await pkcs10.subjectPublicKeyInfo.importKey(publicKey);
 
     var toDigest = pkcs10.subjectPublicKeyInfo.subjectPublicKey.valueBlock.valueHex;
-    var pubkeyhash_sha1 = await crypto.subtle.digest('SHA-1', toDigest);
+    var pubkeyhash_sha1 = await webcrypto.subtle.digest('SHA-1', toDigest);
     //pubkeyhash_sha256 = await webcrypto.subtle.digest('SHA-256', toDigest);
 
     pkcs10.attributes = [];
     pkcs10.attributes.push(new pkijs.Attribute({
-        type: "1.2.840.113549.1.9.14", // pkcs-9-at-extensionRequest
+        type: '1.2.840.113549.1.9.14', // pkcs-9-at-extensionRequest
         values: [(new pkijs.Extensions({
             extensions: [
                 new pkijs.Extension({
-                    extnID: "2.5.29.14",
+                    extnID: '2.5.29.14',
                     critical: false,
                     extnValue: new asn1js.OctetString({ valueHex: pubkeyhash_sha1 }).toBER(false)
                 }),
                 new pkijs.Extension({
-                    extnID: "2.5.29.17",
+                    extnID: '2.5.29.17',
                     critical: false,
                     extnValue: new pkijs.GeneralNames({
                         names: params.domains.map(dom => new pkijs.GeneralName({
@@ -132,15 +131,15 @@ export async function csr(params: ICsr_Params): Promise<ICsr_Result> {
             signedPKCS10 = await pkcs10.sign(privateKey, 'SHA-256'),
             pkcs10_schema = pkcs10.toSchema(),
             pkcs10_encoded = pkcs10_schema.toBER(false),
-            exportedPkcs8 = await crypto.subtle.exportKey('pkcs8', keys.privateKey);
+            exportedPkcs8 = await webcrypto.subtle.exportKey('pkcs8', keys.privateKey);
 
     return { 
         pem: bufferToPem(pkcs10_encoded, 'CERTIFICATE REQUEST'),
         der: ne_text.bufferToBase64Url(pkcs10_encoded),
         pkcs8_pem: bufferToPem(exportedPkcs8, 'PRIVATE KEY'),
         pkcs8_b64: ne_text.bufferToBase64(exportedPkcs8),
-        privateJwk: await crypto.subtle.exportKey('jwk', keys.privateKey),
-        publicJwk: await crypto.subtle.exportKey('jwk', keys.publicKey)
+        privateJwk: await webcrypto.subtle.exportKey('jwk', keys.privateKey),
+        publicJwk: await webcrypto.subtle.exportKey('jwk', keys.publicKey)
     };
 }
 
@@ -160,21 +159,21 @@ export async function pfx(friendlyName: string, cert_b64: string, key_b64: strin
                 parsedValue: {
                     safeContents: [
                         {
-                            privacyMode: 0, // "No Privacy" mode
+                            privacyMode: 0, // 'No Privacy' mode
                             value: new pkijs.SafeContents({
                                 safeBags: [
                                     new pkijs.SafeBag({
-                                        bagId: "1.2.840.113549.1.12.10.1.1",
+                                        bagId: '1.2.840.113549.1.12.10.1.1',
                                         bagValue: objc_key
                                     }),
                                     new pkijs.SafeBag({
-                                        bagId: "1.2.840.113549.1.12.10.1.3",
+                                        bagId: '1.2.840.113549.1.12.10.1.3',
                                         bagValue: new pkijs.CertBag({
                                             parsedValue: objc_cer
                                         }),
                                         bagAttributes: [
                                             new pkijs.Attribute({
-                                                type: "1.2.840.113549.1.9.20", // friendlyName
+                                                type: '1.2.840.113549.1.9.20', // friendlyName
                                                 values: [
                                                     new asn1js.BmpString({value: friendlyName})
                                                 ]
@@ -191,7 +190,7 @@ export async function pfx(friendlyName: string, cert_b64: string, key_b64: strin
     });
 
     await pkcs12.parsedValue.authenticatedSafe.makeInternalValues({
-        safeContents: [{ /* Empty as "No Privacy" for SafeContents */ }]
+        safeContents: [{ /* Empty as 'No Privacy' for SafeContents */ }]
     });
     
     await pkcs12.makeInternalValues({
@@ -217,7 +216,7 @@ export function base64ToPem(base64: string, title: string): string {
 
     let result_string = '';
     for (var i = 0, count = 0; i < string_length; i++, count++) {
-        if (count > 63) { result_string += "\r\n"; count = 0; }
+        if (count > 63) { result_string += '\r\n'; count = 0; }
         result_string += base64[i];
     }
 

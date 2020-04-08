@@ -12,7 +12,8 @@ export default {
     file: pkg.browser,
     format: 'umd',
     globals: {
-      '@ne1410s/text': 'ne_text'
+      'asn1js': 'asn1js',
+      '@ne1410s/text': 'ne_text',
     }
   },
   plugins: [
