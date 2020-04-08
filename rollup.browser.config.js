@@ -13,11 +13,12 @@ export default {
     format: 'umd',
     globals: {
       'asn1js': 'asn1js',
+      'node-webcrypto-ossl': 'WebCrypto',
       '@ne1410s/text': 'ne_text',
     }
   },
   plugins: [
-    resolve(), // find external modules
+    resolve(), // find external modules  // TODO
     commonjs(), // convert external modules to ES modules
     typescript(),
     terser({
