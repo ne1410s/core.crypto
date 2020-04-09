@@ -27,19 +27,20 @@ const DEF_ALGO: RsaHashedKeyGenParams = {
 
 export async function randomString(): Promise<string> {
     
-    const bytes = new Uint8Array(24);
-    crypto.randomFill(bytes, () => {});
-
-    return ne_text.bufferToBase64Url(bytes.buffer);
+    return new Promise((resolve, reject) => {
+        crypto.randomFill(new Uint8Array(24), (err, buf) => {
+            if (err) reject(err);
+            else resolve(ne_text.bufferToBase64Url(buf));
+        });
+    });
 }
 
 export async function gen(): Promise<{publicKey: string, privateKey: string}> {
 
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
         crypto.generateKeyPair('rsa', TEST, (err: Error, publicKey: string, privateKey: string) => {
-            // hmmm JWK format?
-            console.log(publicKey, privateKey);
-            resolve({ publicKey, privateKey });
+            if (err) reject(err);
+            else resolve({ publicKey, privateKey });
         });
     });
 
