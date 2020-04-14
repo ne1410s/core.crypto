@@ -8,7 +8,7 @@ import pkg from './package.json';
 export default {
   input: 'src/index.ts',
   output: {
-    name: 'ne_crypto',
+    name: pkg.displayName,
     file: pkg.browser,
     format: 'umd',
     globals: {

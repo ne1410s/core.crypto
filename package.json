@@ -1,10 +1,11 @@
 {
   "name": "@ne1410s/crypto",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Lightweight ES5 script to provide crypto utilities",
   "main": "dist/ne14_crypto.cjs.min.js",
   "module": "dist/ne14_crypto.esm.min.js",
   "browser": "dist/ne14_crypto.umd.min.js",
+  "displayName": "ne_crypto",
   "types": "dist/index.d.ts",
   "files": [
     "dist"
