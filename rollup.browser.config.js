@@ -11,13 +11,13 @@ export default {
     file: pkg.browser,
     format: 'umd',
     globals: {
-      'asn1js': 'asn1js',
+      asn1js: 'asn1js',
       '@ne1410s/text': 'ne_text',
-    }
+    },
   },
   plugins: [
     resolve(), // find external modules
     commonjs(), // convert external modules to ES modules
-    typescript()
-  ]
+    typescript(),
+  ],
 };

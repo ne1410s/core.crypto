@@ -13,8 +13,10 @@
   "scripts": {
     "dev": "npx rollup -c rollup.browser.config.js -m -w",
     "clean": "npx rimraf dist && rimraf test/**/*.p12",
+    "is-pretty": "npx prettier --list-different . --ignore-path .gitignore",
+    "prettify": "npx prettier --write . --ignore-path .gitignore",
     "build": "npm run clean && npx rollup -c",
-    "test": "npm run build && mocha --exit",
+    "test": "npm run is-pretty && npm run build && mocha --exit",
     "publish-local": "npm run build && npm pack",
     "publish-patch": "npm run build && npm version patch && npm publish --access public",
     "publish-minor": "npm run build && npm version minor && npm publish --access public",
@@ -36,17 +38,18 @@
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^13.0.0",
-    "@rollup/plugin-node-resolve": "^8.0.1",
-    "@types/pkijs": "0.0.3",
+    "@rollup/plugin-node-resolve": "^8.1.0",
+    "@types/pkijs": "0.0.4",
     "chai": "^4.2.0",
     "mocha": "^8.0.1",
+    "prettier": "^2.0.5",
     "rimraf": "^3.0.2",
-    "rollup": "^2.15.0",
+    "rollup": "^2.18.0",
     "rollup-plugin-typescript2": "^0.27.1",
     "typescript": "^3.9.5"
   },
   "dependencies": {
-    "@ne1410s/text": "^0.2.3",
+    "@ne1410s/text": "^0.2.4",
     "asn1js": "^2.0.26",
     "node-webcrypto-ossl": "^2.1.0",
     "pkijs": "^2.1.89"
