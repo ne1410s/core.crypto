@@ -9,7 +9,6 @@ ES Crypto Utilities
 **However**, this did not seem to provide a reliable solution in all cases. So it is recommended to install the following components manually instead:
 
 - Python 2.7.x
-- Visual Studio 2013 or higher, with:
-  - Cpp Build Tools
-  - VC++ v1.40
-  - Windows SDK
+- Visual Studio 2019, with:
+  - MSVC v142 - VS 2019 C++ build tools (v14.28)
+  - Windows 10 SDK (10.0.17763.0)
