@@ -37,19 +37,19 @@
     "url": "https://github.com/ne1410s/ne14.crypto/issues"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^18.1.0",
+    "@rollup/plugin-commonjs": "^19.0.0",
     "@rollup/plugin-node-resolve": "^13.0.0",
     "@types/pkijs": "0.0.6",
     "chai": "^4.3.4",
     "mocha": "^8.4.0",
-    "prettier": "^2.2.1",
+    "prettier": "^2.3.0",
     "rimraf": "^3.0.2",
-    "rollup": "^2.47.0",
+    "rollup": "^2.48.0",
     "rollup-plugin-typescript2": "^0.30.0",
     "typescript": "^4.2.4"
   },
   "dependencies": {
-    "@ne1410s/text": "^0.2.20",
+    "@ne1410s/text": "^0.2.21",
     "asn1js": "^2.1.1",
     "node-webcrypto-ossl": "^2.1.2",
     "pkijs": "^2.1.95"
