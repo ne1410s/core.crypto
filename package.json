@@ -41,15 +41,15 @@
     "@rollup/plugin-node-resolve": "^13.0.0",
     "@types/pkijs": "0.0.6",
     "chai": "^4.3.4",
-    "mocha": "^8.4.0",
-    "prettier": "^2.3.0",
+    "mocha": "^9.0.0",
+    "prettier": "^2.3.1",
     "rimraf": "^3.0.2",
-    "rollup": "^2.50.6",
+    "rollup": "^2.51.0",
     "rollup-plugin-typescript2": "^0.30.0",
     "typescript": "^4.3.2"
   },
   "dependencies": {
-    "@ne1410s/text": "^0.2.22",
+    "@ne1410s/text": "^0.2.23",
     "asn1js": "^2.1.1",
     "node-webcrypto-ossl": "^2.1.2",
     "pkijs": "^2.1.95"
